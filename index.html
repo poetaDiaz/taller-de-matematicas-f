@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<!-- Declaración del tipo de documento HTML5 -->
+
+<html lang="es">
+<!-- Etiqueta raíz del documento, lang="es" indica que el contenido está en español -->
+
+<head>
+    <!-- ============================================ -->
+    <!-- SECCIÓN HEAD: Metadatos y configuración -->
+    <!-- ============================================ -->
+    
+    <meta charset="UTF-8">
+    <!-- Codificación de caracteres UTF-8 para aceptar tildes, ñ y caracteres especiales -->
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Hace que la página sea responsive (adaptable a móviles y tablets) -->
+    
+    <title>Taller de Matemáticas Financieras</title>
+    <!-- Título que aparece en la pestaña del navegador -->
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- Librería SheetJS para crear archivos de Excel desde JavaScript -->
+    
+    <style>
+        /* ============================================ */
+        /* ESTILOS CSS - DISEÑO Y APARIENCIA */
+        /* ============================================ */
+        
+        /* --- RESET GLOBAL --- */
+        * {
+            margin: 0;           /* Elimina márgenes por defecto */
+            padding: 0;          /* Elimina espaciados por defecto */
+            box-sizing: border-box;  /* Incluye padding y border en el ancho total */
+        }
+        
+        /* --- BODY: Fondo y configuración general --- */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;  /* Fuente moderna */
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);  /* Gradiente morado-azul */
+            min-height: 100vh;   /* Altura mínima del 100% de la ventana */
+            padding: 20px;       /* Espaciado alrededor de todo el contenido */
+        }
+        
+        /* --- CONTAINER: Caja principal blanca --- */
+        .container {
+            max-width: 1400px;   /* Ancho máximo de 1400 píxeles */
+            margin: 0 auto;      /* Centra horizontalmente el contenedor */
+            background: white;   /* Fondo blanco */
+            border-radius: 20px; /* Esquinas redondeadas de 20px */
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);  /* Sombra 3D profunda */
+            overflow: hidden;    /* Oculta contenido que se salga de las esquinas */
+        }
+        
+        /* --- HEADER: Encabezado azul superior --- */
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);  /* Gradiente azul oscuro */
+            color: white;        /* Texto en color blanco */
+            padding: 40px;       /* Espaciado interno de 40px */
+            text-align: center;  /* Centra el texto */
+        }
+        
+        /* --- HEADER H1: Título principal --- */
+        .header h1 {
+            font-size: 2.5em;    /* Tamaño de fuente 2.5 veces más grande */
+            margin-bottom: 10px; /* Espacio debajo del título */
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);  /* Sombra detrás del texto */
+        }
+        
+        /* --- HEADER P: Subtítulo --- */
+        .header p {
+            font-size: 1.2em;    /* Tamaño 1.2 veces el normal */
+            opacity: 0.9;        /* Ligera transparencia (90% opaco) */
+        }
+        
+        /* --- CONTENT: Contenedor del contenido principal --- */
+        .content {
+            padding: 40px;       /* Espaciado interno de 40px */
+        }
+        
+        /* --- PROBLEM: Caja de cada problema --- */
+        .problem {
+            background: #f8f9fa;  /* Fondo gris muy claro */
+            border-left: 5px solid #667eea;  /* Barra morada a la izquierda de 5px */
+            padding: 25px;        /* Espaciado interno */
+            margin-bottom: 30px;  /* Espacio entre problemas */
+            border-radius: 10px;  /* Esquinas redondeadas */
+            transition: transform 0.3s ease, box-shadow 0.3s ease;  /* Animación suave de 0.3 segundos */
+        }
+        
+        /* --- PROBLEM HOVER: Efecto al pasar el mouse --- */
+        .problem:hover {
+            transform: translateX(10px);  /* Mueve la caja 10px a la derecha */
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);  /* Añade una sombra suave */
+        }
+        
+        /* --- PROBLEM-TITLE: Título de cada problema --- */
+        .problem-title {
+            color: #1e3c72;       /* Color azul oscuro */
+            font-size: 1.3em;     /* Tamaño de fuente 1.3 veces mayor */
+            font-weight: bold;    /* Texto en negrita */
+            margin-bottom: 15px;  /* Espacio debajo del título */
+            display: flex;        /* Usa flexbox para alinear elementos */
+            align-items: center;  /* Centra verticalmente los elementos */
+        }
+        
+        /* --- PROBLEM-NUMBER: Círculo con número --- */
+        .problem-number {
+            background: #667eea;  /* Fondo morado */
+            color: white;         /* Número en blanco */
+            width: 35px;          /* Ancho de 35px */
+            height: 35px;         /* Alto de 35px (igual al ancho para hacer círculo) */
+            border-radius: 50%;   /* 50% hace un círculo perfecto */
+            display: flex;        /* Usa flexbox */
+            align-items: center;  /* Centra verticalmente */
+            justify-content: center;  /* Centra horizontalmente */
+            margin-right: 15px;   /* Espacio a la derecha del círculo */
+            font-weight: bold;    /* Número en negrita */
+        }
+        
+        /* --- PROBLEM-TEXT: Texto del enunciado --- */
+        .problem-text {
+            color: #495057;       /* Color gris oscuro */
+            line-height: 1.8;     /* Altura de línea para mejor lectura */
+            margin-bottom: 20px;  /* Espacio debajo del texto */
+        }
+        
+        /* --- SOLUTION: Caja de la solución --- */
+        .solution {
+            background: white;    /* Fondo blanco */
+            padding: 20px;        /* Espaciado interno */
+            border-radius: 8px;   /* Esquinas redondeadas */
+            border: 2px solid #e9ecef;  /* Borde gris claro de 2px */
+        }
+        
+        /* --- SOLUTION-TITLE: Título de la solución --- */
+        .solution-title {
+            color: #28a745;       /* Color verde */
+            font-weight: bold;    /* Texto en negrita */
+            margin-bottom: 10px;  /* Espacio debajo */
+            font-size: 1.1em;     /* Tamaño ligeramente mayor */
+        }
+        
+        /* --- FORMULA: Caja amarilla de fórmulas --- */
+        .formula {
+            background: #fff3cd;  /* Fondo amarillo claro */
+            padding: 15px;        /* Espaciado interno */
+            border-radius: 5px;   /* Esquinas redondeadas */
+            margin: 10px 0;       /* Espacio arriba y abajo */
+            font-family: 'Courier New', monospace;  /* Fuente tipo código */
+            border-left: 3px solid #ffc107;  /* Barra amarilla a la izquierda */
+        }
+        
+        /* --- RESULT: Caja verde de resultados --- */
+        .result {
+            background: #d4edda;  /* Fondo verde claro */
+            padding: 15px;        /* Espaciado interno */
+            border-radius: 5px;   /* Esquinas redondeadas */
+            margin-top: 10px;     /* Espacio arriba */
+            font-weight: bold;    /* Texto en negrita */
+            color: #155724;       /* Texto verde oscuro */
+            border-left: 3px solid #28a745;  /* Barra verde a la izquierda */
+        }
+        
+        /* --- DOWNLOAD-SECTION: Sección de descarga --- */
+        .download-section {
+            text-align: center;   /* Centra el contenido */
+            padding: 40px;        /* Espaciado interno */
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);  /* Gradiente rosa-rojo */
+            margin-top: 30px;     /* Espacio arriba */
+        }
+        
+        /* --- DOWNLOAD-BTN: Botón de descarga --- */
+        .download-btn {
+            background: white;    /* Fondo blanco */
+            color: #f5576c;       /* Texto rosado */
+            padding: 15px 40px;   /* Espaciado interno (arriba-abajo 15px, izq-der 40px) */
+            border: none;         /* Sin borde */
+            border-radius: 50px;  /* Bordes muy redondeados (forma de píldora) */
+            font-size: 1.2em;     /* Tamaño de fuente más grande */
+            font-weight: bold;    /* Texto en negrita */
+            cursor: pointer;      /* Cambia el cursor a manita al pasar por encima */
+            transition: all 0.3s ease;  /* Animación suave de todos los cambios */
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);  /* Sombra del botón */
+        }
+        
+        /* --- DOWNLOAD-BTN HOVER: Efecto al pasar el mouse sobre el botón --- */
+        .download-btn:hover {
+            transform: translateY(-3px);  /* Mueve el botón 3px hacia arriba */
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);  /* Aumenta la sombra */
+        }
+        
+        /* --- TABLE-CONTAINER: Contenedor de tablas --- */
+        .table-container {
+            overflow-x: auto;     /* Permite scroll horizontal si la tabla es muy ancha */
+            margin: 15px 0;       /* Espacio arriba y abajo */
+        }
+        
+        /* --- TABLE: Estilo de tablas --- */
+        table {
+            width: 100%;          /* Ocupa todo el ancho disponible */
+            border-collapse: collapse;  /* Une los bordes de las celdas */
+            margin: 10px 0;       /* Espacio arriba y abajo */
+        }
+        
+        /* --- TH y TD: Celdas de la tabla --- */
+        th, td {
+            padding: 12px;        /* Espaciado interno de las celdas */
+            text-align: left;     /* Alinea el texto a la izquierda */
+            border: 1px solid #dee2e6;  /* Borde gris claro */
+        }
+        
+        /* --- TH: Encabezados de tabla --- */
+        th {
+            background: #667eea;  /* Fondo morado */
+            color: white;         /* Texto blanco */
+            font-weight: bold;    /* Texto en negrita */
+        }
+        
+        /* --- TR:NTH-CHILD(EVEN): Filas pares con fondo diferente --- */
+        tr:nth-child(even) {
+            background: #f8f9fa;  /* Fondo gris claro (efecto zebra para mejor lectura) */
+        }
+        
+        /* --- NOTE: Caja de notas informativas --- */
+        .note {
+            background: #e7f3ff;  /* Fondo azul muy claro */
+            padding: 15px;        /* Espaciado interno */
+            border-radius: 5px;   /* Esquinas redondeadas */
+            margin: 10px 0;       /* Espacio arriba y abajo */
+            border-left: 3px solid #2196F3;  /* Barra azul a la izquierda */
+            font-style: italic;   /* Texto en cursiva */
+        }
+    </style>
+</head>
+
+<body>
+    <!-- ============================================ -->
+    <!-- BODY: Contenido visible de la página -->
+    <!-- ============================================ -->
+    
+    <div class="container">
+        <!-- Contenedor principal blanco con sombra -->
+        
+        <div class="header">
+            <!-- Encabezado azul con gradiente -->
+            <h1>📊 Taller de Matemáticas Financieras</h1>
+            <!-- Título principal con emoji -->
+            <p>Resolución de 10 problemas con fórmulas de Excel</p>
+            <!-- Subtítulo descriptivo -->
+        </div>
+        
+        <div class="content">
+            <!-- Contenedor del contenido principal (los 10 problemas) -->
+            
+            <!-- ========================================== -->
+            <!-- PROBLEMA 1: Cálculo de Préstamo Inicial -->
+            <!-- ========================================== -->
+            <div class="problem">
+                <!-- Caja gris con borde morado para el problema 1 -->
+                
+                <div class="problem-title">
+                    <!-- Título del problema con círculo numerado -->
+                    <span class="problem-number">1</span>
+                    <!-- Círculo morado con el número 1 -->
+                    Cálculo de Préstamo Inicial
+                    <!-- Nombre del problema -->
+                </div>
+                
+                <div class="problem-text">
+                    <!-- Enunciado del problema -->
+                    Se ha solicitado un préstamo a un plazo de 5 años a una tasa de interés del 1.15% efectivo mensual y la cantidad que se ha pagado al final del tiempo ha sido de $24 millones. ¿De cuánto se ha pedido el préstamo?
+                </div>
+                
+                <div class="solution">
+                    <!-- Caja blanca con la solución -->
+                    
+                    <div class="solution-title">✓ Solución:</div>
+                    <!-- Título verde de la solución -->
+                    
+                    <div class="formula">
+                        <!-- Caja amarilla con las fórmulas -->
+                        Fórmula Excel: =VA(1.15%; 60; 0; -24000000; 0)<br>
+                        Donde: i = 1.15% mensual, n = 60 meses, VF = $24,000,000
+                    </div>
+                    
+                    <div class="result">
+                        <!-- Caja verde con el resultado -->
+                        Valor del Préstamo (VP): $12,088,843.28
+                    </div>
+                    
+                    <div class="note">
+                        <!-- Nota informativa en azul claro -->
+                        Se utiliza la función VA (Valor Actual) para calcular el valor presente de un pago futuro.
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========================================== -->
+            <!-- PROBLEMA 2: Conversión de Tasas Nominales -->
+            <!-- ========================================== -->
+            <div class="problem">
+                <div class="problem-title">
+                    <span class="problem-number">2</span>
+                    Conversión de Tasas Nominales Anticipadas
+                </div>
+                
+                <div class="problem-text">
+                    Se tiene una tasa nominal del 1,65% mensual, 2,85% bimensual, 3,95% trimestral, 6,35% semestral, todas anticipadas; ¿cuál es su equivalencia en tasa nominal mensual, bimensual, trimestral y semestral?
+                </div>
+                
+                <div class="solution">
+                    <div class="solution-title">✓ Solución:</div>
+                    
+                    <div class="table-container">
+                        <!-- Contenedor con scroll horizontal para la tabla -->
+                        <table>
+                            <!-- Tabla con los resultados -->
+                            <tr>
+                                <!-- Fila de encabezados con fondo morado -->
+                                <th>Tasa Original</th>
+                                <th>Fórmula Conversión</th>
+                                <th>Tasa Efectiva</th>
+                                <th>T.N. Mensual</th>
+                                <th>T.N. Bimensual</th>
+                                <th>T.N. Trimestral</th>
+                                <th>T.N. Semestral</th>
+                            </tr>
+                            <tr>
+                                <!-- Primera fila de datos -->
+                                <td>1.65% mensual ant.</td>
+                                <td>=1.65%/(1-1.65%)</td>
+                                <td>1.6777%</td>
+                                <td>1.6777%</td>
+                                <td>3.3554%</td>
+                                <td>5.0331%</td>
+                                <td>10.0662%</td>
+                            </tr>
+                            <tr>
+                                <!-- Segunda fila (tendrá fondo gris por el nth-child(even)) -->
+                                <td>2.85% bimensual ant.</td>
+                                <td>=2.85%/(1-2.85%)</td>
+                                <td>2.9352%</td>
+                                <td>1.4580%</td>
+                                <td>2.9352%</td>
+                                <td>4.4028%</td>
+                                <td>8.8056%</td>
+                            </tr>
+                            <tr>
+                                <td>3.95% trimestral ant.</td>
+                                <td>=3.95%/(1-3.95%)</td>
+                                <td>4.1127%</td>
+                                <td>1.3553%</td>
+                                <td>2.7239%</td>
+                                <td>4.1127%</td>
+                                <td>8.2254%</td>
+                            </tr>
+                            <tr>
+                                <td>6.35% semestral ant.</td>
+                                <td>=6.35%/(1-6.35%)</td>
+                                <td>6.7806%</td>
+                                <td>1.1094%</td>
+                                <td>2.2301%</td>
+                                <td>3.3602%</td>
+                                <td>6.7806%</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========================================== -->
+            <!-- PROBLEMA 3: Valor de Contado -->
+            <!-- ========================================== -->
+            <div class="problem">
+                <div class="problem-title">
+                    <span class="problem-number">3</span>
+                    Valor de Contado de una Propiedad
+                </div>
+                
+                <div class="problem-text">
+                    Calcular el valor de contado de una propiedad vendida en las siguientes condiciones: $20 millones de contado; $1.000.000 por mensualidades vencidas durante 2 años y 6 meses y un último pago de $1.000.000 un mes después de pagada la última mensualidad. Para el cálculo, utilizar el 1.5% efectivo mensual.
+                </div>
+                
+                <div class="solution">
+                    <div class="solution-title">✓ Solución:</div>
+                    <div class="formula">
+                        Cuota Inicial: $20,000,000<br>
+                        VA de Mensualidades: =VA(1.5%; 30; -1000000; 0; 0) = $24,889,353.15<br>
+                        VA del Pago Final: =VA(1.5%; 31; 0; -1000000; 0) = $631,308.20<br>
+                        <br>
+                        <strong>Valor Total de Contado: $45,520,661.35</strong>
+                    </div>
+                    <div class="result">
+                        Valor de Contado: $45,520,661.35
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========================================== -->
+            <!-- PROBLEMA 4: Conversión de Tasas Efectivas -->
+            <!-- ========================================== -->
+            <div class="problem">
+                <div class="problem-title">
+                    <span class="problem-number">4</span>
+                    Conversión de Tasas Efectivas
+                </div>
+                
+                <div class="problem-text">
+                    Se tiene una tasa efectiva periódica del 1,38% mensual, 2,57% bimensual, 3,69% trimestral, 6,44% semestral, ¿Cuál es su equivalencia en tasa efectiva periódica semestral y nominal anticipada trimestral y semestral?
+                </div>
+                
+                <div class="solution">
+                    <div class="solution-title">✓ Solución:</div>
+                    <div class="table-container">
+                        <table>
+                            <tr>
+                                <th>Tasa Original</th>
+                                <th>T.E. Semestral</th>
+                                <th>T.N. Ant. Trimestral</th>
+                                <th>T.N. Ant. Semestral</th>
+                            </tr>
+                            <tr>
+                                <td>1.38% mensual</td>
+                                <td>=((1+1.38%)^6)-1 = 8.57%</td>
+                                <td>=((1+1.38%)^3-1)/(1+1.38%)^3*4 = 16.09%</td>
+                                <td>=(8.57%/(1+8.57%))*2 = 15.78%</td>
+                            </tr>
+                            <tr>
+                                <td>2.57% bimensual</td>
+                                <td>=((1+2.57%)^3)-1 = 7.95%</td>
+                                <td>=((1+2.57%)^1.5-1)/(1+2.57%)^1.5*4 = 15.22%</td>
+                                <td>=(7.95%/(1+7.95%))*2 = 14.73%</td>
+                            </tr>
+                            <tr>
+                                <td>3.69% trimestral</td>
+                                <td>=((1+3.69%)^2)-1 = 7.51%</td>
+                                <td>=(3.69%/(1+3.69%))*4 = 14.23%</td>
+                                <td>=(7.51%/(1+7.51%))*2 = 13.97%</td>
+                            </tr>
+                            <tr>
+                                <td>6.44% semestral</td>
+                                <td>6.44%</td>
+                                <td>=((1+6.44%)^0.5-1)/(1+6.44%)^0.5*4 = 12.21%</td>
+                                <td>=(6.44%/(1+6.44%))*2 = 12.10%</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========================================== -->
+            <!-- PROBLEMA 5: Tiempo de Inversión -->
+            <!-- ========================================== -->
+            <div class="problem">
+                <div class="problem-title">
+                    <span class="problem-number">5</span>
+                    Cálculo del Tiempo de Inversión
+                </div>
+                
+                <div class="problem-text">
+                    ¿Qué tiempo se requiere para que $14 millones invertidos al 1,25% efectivo mensual se conviertan en $30 millones?
+                </div>
+                
+                <div class="solution">
+                    <div class="solution-title">✓ Solución:</div>
+                    <div class="formula">
+                        Fórmula Excel: =NPER(1.25%; 0; -14000000; 30000000; 0)<br>
+                        Donde: i = 1.25%, VP = $14,000,000, VF = $30,000,000
+                    </div>
+                    <div class="result">
+                        Número de Períodos: 64.58 meses (5 años, 4 meses y 17 días aproximadamente)
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========================================== -->
+            <!-- PROBLEMA 6: Valor Futuro -->
+            <!-- ========================================== -->
+            <div class="problem">
+                <div class="problem-title">
+                    <span class="problem-number">6</span>
+                    Valor Futuro de una Inversión
+                </div>
+                
+                <div class="problem-text">
+                    Se tiene una inversión inicial de $20 millones y se quiere hallar el valor futuro para el tiempo y tasa de interés dados:
+                    <br>a) Dentro de 6 meses: 1.75% efectivo mensual
+                    <br>b) Dentro de dos años y medio: 3.5% efectivo bimestral
+                    <br>c) Dentro de 3 años: 4.5% efectivo semestral
+                </div>
+                
+                <div class="solution">
+                    <div class="solution-title">✓ Solución:</div>
+                    <div class="table-container">
+                        <table>
+                            <tr>
+                                <th>Escenario</th>
+                                <th>Fórmula Excel</th>
+                                <th>Valor Futuro</th>
+                            </tr>
+                            <tr>
+                                <td>a) 6 meses al 1.75% mensual</td>
+                                <td>=VF(1.75%; 6; 0; -20000000; 0)</td>
+                                <td>$22,180,931.52</td>
+                            </tr>
+                            <tr>
+                                <td>b) 2.5 años al 3.5% bimestral</td>
+                                <td>=VF(3.5%; 15; 0; -20000000; 0)</td>
+                                <td>$33,524,968.36</td>
+                            </tr>
+                            <tr>
+                                <td>c) 3 años al 4.5% semestral</td>
+                                <td>=VF(4.5%; 6; 0; -20000000; 0)</td>
+                                <td>$25,958,469.06</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========================================== -->
+            <!-- PROBLEMA 7: Número de Pagos -->
+            <!-- ========================================== -->
+            <div class="problem">
+                <div class="problem-title">
+                    <span class="problem-number">7</span>
+                    Número de Pagos para Acumular Capital
+                </div>
+                
+                <div class="problem-text">
+                    ¿Cuántos pagos deben realizarse para llegar a acumular $39.287.280 si se depositan $500,000 mensuales, con una tasa de interés del 1,8% efectivo mensual?
+                </div>
+                
+                <div class="solution">
+                    <div class="solution-title">✓ Solución:</div>
+                    <div class="formula">
+                        Fórmula Excel: =NPER(1.8%; -500000; 0; 39287280; 0)<br>
+                        Donde: i = 1.8%, Pago = $500,000, VF = $39,287,280
+                    </div>
+                    <div class="result">
+                        Número de Pagos: 60 meses (5 años)
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========================================== -->
+            <!-- PROBLEMA 8: Conversión de Tasa -->
+            <!-- ========================================== -->
+            <div class="problem">
+                <div class="problem-title">
+                    <span class="problem-number">8</span>
+                    Conversión de Tasa Efectiva Mensual
+                </div>
+                
+                <div class="problem-text">
+                    Convertir el 1.72% efectivo mensual a una tasa nominal trimestral y semestral anticipada y vencida.
+                </div>
+                
+                <div class="solution">
+                    <div class="solution-title">✓ Solución:</div>
+                    <div class="table-container">
+                        <table>
+                            <tr>
+                                <th>Tipo de Tasa</th>
+                                <th>Fórmula</th>
+                                <th>Resultado</th>
+                            </tr>
+                            <tr>
+                                <td>T.N. Trimestral Vencida</td>
+                                <td>=(((1+1.72%)^3)-1)*4</td>
+                                <td>21.28%</td>
+                            </tr>
+                            <tr>
+                                <td>T.N. Semestral Vencida</td>
+                                <td>=(((1+1.72%)^6)-1)*2</td>
+                                <td>21.72%</td>
+                            </tr>
+                            <tr>
+                                <td>T.N. Trimestral Anticipada</td>
+                                <td>=((((1+1.72%)^3)-1)/(1+1.72%)^3)*4</td>
+                                <td>20.30%</td>
+                            </tr>
+                            <tr>
+                                <td>T.N. Semestral Anticipada</td>
+                                <td>=((((1+1.72%)^6)-1)/(1+1.72%)^6)*2</td>
+                                <td>19.59%</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========================================== -->
+            <!-- PROBLEMA 9: Ahorro para Casa -->
+            <!-- ========================================== -->
+            <div class="problem">
+                <div class="problem-title">
+                    <span class="problem-number">9</span>
+                    Ahorro Mensual para Compra de Casa
+                </div>
+                
+                <div class="problem-text">
+                    ¿De cuánto deberá ser el ahorro mensual de una persona que proyecta adquirir una casa de $150,000,000 dentro de cinco años, si la fiducia le asegura una tasa de interés efectiva mensual del 1,75%?
+                </div>
+                
+                <div class="solution">
+                    <div class="solution-title">✓ Solución:</div>
+                    <div class="formula">
+                        Fórmula Excel: =PAGO(1.75%; 60; 0; -150000000; 0)<br>
+                        Donde: i = 1.75%, n = 60 meses, VF = $150,000,000
+                    </div>
+                    <div class="result">
+                        Ahorro Mensual Requerido: $1,734,549.41
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========================================== -->
+            <!-- PROBLEMA 10: Ahorro para Educación -->
+            <!-- ========================================== -->
+            <div class="problem">
+                <div class="problem-title">
+                    <span class="problem-number">10</span>
+                    Ahorro para Educación Universitaria
+                </div>
+                
+                <div class="problem-text">
+                    Un padre de familia quiere conocer de cuánto dispondrá para la educación superior de su hijo, si inicia un ahorro mensual de $800,000, un mes antes de que cumpla 10 años y hasta cuando cumpla 18, edad en la cual estima iniciará los estudios universitarios; la fiducia donde se realiza el ahorro asegura una tasa de interés del 15%.
+                </div>
+                
+                <div class="solution">
+                    <div class="solution-title">✓ Solución:</div>
+                    <div class="formula">
+                        Tasa mensual: =15%/12 = 1.25%<br>
+                        Número de meses: 8 años × 12 = 96 meses<br>
+                        Fórmula Excel: =VF(1.25%; 96; -800000; 0; 0)
+                    </div>
+                    <div class="result">
+                        Capital Acumulado: $154,916,558.67
+                    </div>
+                    <div class="note">
+                        Se asume que el 15% es tasa nominal anual, por lo que se divide entre 12 para obtener la tasa efectiva mensual.
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+        <!-- Fin del div "content" -->
+
+        <!-- ========================================== -->
+        <!-- SECCIÓN DE DESCARGA -->
+        <!-- ========================================== -->
+        <div class="download-section">
+            <!-- Sección con gradiente rosa-rojo para descargar el Excel -->
+            
+            <h2 style="color: white; margin-bottom: 20px;">📥 Descarga la Hoja de Excel</h2>
+            <!-- Título de la sección en blanco -->
+            
+            <button class="download-btn" onclick="generarExcel()">Descargar Archivo Excel</button>
+            <!-- Botón blanco redondeado que ejecuta la función generarExcel() al hacer clic -->
+        </div>
+        
+    </div>
+    <!-- Fin del div "container" (contenedor principal) -->
+
+    <!-- ============================================ -->
+    <!-- JAVASCRIPT: Lógica para generar el Excel -->
+    <!-- ============================================ -->
+    <script>
+        /**
+         * Función: generarExcel()
+         * Propósito: Crear y descargar un archivo Excel con todos los problemas resueltos
+         * Se ejecuta cuando el usuario hace clic en el botón "Descargar Archivo Excel"
+         */
+        function generarExcel() {
+            
+            // --- PASO 1: Crear un nuevo libro de Excel vacío ---
+            const wb = XLSX.utils.book_new();
+            // wb = WorkBook (libro de trabajo)
+            // XLSX.utils.book_new() crea un objeto de libro Excel en memoria
+            
+            // ========================================
+            // PROBLEMA 1: Crear la hoja del problema 1
+            // ========================================
+            const ws1 = XLSX.utils.aoa_to_sheet([
+                // aoa_to_sheet convierte un "Array de Arrays" en una hoja de Excel
+                // Cada array interno representa una FILA
+                // Cada elemento del array representa una CELDA
+                
+                ['PROBLEMA 1: CÁLCULO DE PRÉSTAMO INICIAL'],  // Fila 1, columna A
+                [],  // Fila 2 vacía (para espaciado)
+                ['Datos:'],  // Fila 3
+                ['Tasa de interés mensual', '1.15%', 0.0115],  // Fila 4: A4='Tasa...', B4='1.15%', C4=0.0115
+                ['Plazo (años)', 5],  // Fila 5
+                ['Plazo (meses)', 60],  // Fila 6
+                ['Valor Futuro', '$24,000,000', 24000000],  // Fila 7
+                [],  // Fila 8 vacía
+                ['Fórmula:', '=VA(C4;C6;0;-C7;0)'],  // Fila 9: muestra la fórmula como texto
+                ['Valor del Préstamo:', '', '=PV(C4,C6,0,-C7,0)']  // Fila 10: B10 vacío, C10 tiene la fórmula activa
+            ]);
+            // ws1 = WorkSheet 1 (hoja de trabajo 1)
+            
+            XLSX.utils.book_append_sheet(wb, ws1, 'Problema 1');
+            // Añade la hoja ws1 al libro wb con el nombre "Problema 1"
+            
+            // ========================================
+            // PROBLEMA 2: Conversión de tasas
+            // ========================================
+            const ws2 = XLSX.utils.aoa_to_sheet([
+                ['PROBLEMA 2: CONVERSIÓN DE TASAS NOMINALES ANTICIPADAS'],
+                [],
+                ['Tasa Original', 'Periodicidad', 'Tasa Ant.', 'T. Efectiva', 'T.N. Mensual', 'T.N. Bimensual', 'T.N. Trimestral', 'T.N. Semestral'],
+                // Fila de encabezados de la tabla
+                
+                ['1.65%', 'Mensual', 0.0165, '=C4/(1-C4)', '=D4*1', '=D4*2', '=D4*3', '=D4*6'],
+                // Las celdas con '=' son FÓRMULAS que Excel calculará automáticamente
+                // Por ejemplo: '=C4/(1-C4)' calcula la tasa efectiva dividiendo C4/(1-C4)
+                
+                ['2.85%', 'Bimensual', 0.0285, '=C5/(1-C5)', '=D5/2', '=D5*1', '=D5*1.5', '=D5*3'],
+                ['3.95%', 'Trimestral', 0.0395, '=C6/(1-C6)', '=D6/3', '=D6/1.5', '=D6*1', '=D6*2'],
+                ['6.35%', 'Semestral', 0.0635, '=C7/(1-C7)', '=D7/6', '=D7/3', '=D7/2', '=D7*1']
+            ]);
+            XLSX.utils.book_append_sheet(wb, ws2, 'Problema 2');
+            
+            // ========================================
+            // PROBLEMA 3: Valor de contado
+            // ========================================
+            const ws3 = XLSX.utils.aoa_to_sheet([
+                ['PROBLEMA 3: VALOR DE CONTADO DE UNA PROPIEDAD'],
+                [],
+                ['Datos:'],
+                ['Cuota inicial', '$20,000,000', 20000000],
+                ['Mensualidad', '$1,000,000', 1000000],
+                ['Plazo mensualidades (años)', 2.5],
+                ['Plazo mensualidades (meses)', 30],
+                ['Pago final', '$1,000,000', 1000000],
+                ['Tasa efectiva mensual', '1.5%', 0.015],
+                [],
+                ['Cálculos:'],
+                ['VA de mensualidades', '=VA(C9;C7;-C5;0;0)', '=PV(C9,C7,-C5,0,0)'],
+                // PV = Present Value (Valor Actual en inglés)
+                // Parámetros: (tasa, períodos, pago, valor_futuro, tipo)
+                
+                ['VA del pago final', '=VA(C9;C7+1;0;-C8;0)', '=PV(C9,C7+1,0,-C8,0)'],
+                [],
+                ['Valor Total de Contado:', '', '=C4+C12+C13']
+                // Suma la cuota inicial + VA de mensualidades + VA del pago final
+            ]);
+            XLSX.utils.book_append_sheet(wb, ws3, 'Problema 3');
+            
+            // ========================================
+            // PROBLEMA 4: Conversión de tasas efectivas
+            // ========================================
+            const ws4 = XLSX.utils.aoa_to_sheet([
+                ['PROBLEMA 4: CONVERSIÓN DE TASAS EFECTIVAS'],
+                [],
+                ['Tasa Original', 'Periodicidad', 'Tasa Ef.', 'T.E. Semestral', 'T.N. Ant. Trimestral', 'T.N. Ant. Semestral'],
+                ['1.38%', 'Mensual', 0.0138, '=((1+C4)^6)-1', '=((1+C4)^3-1)/((1+C4)^3)*4', '=(D4/(1+D4))*2'],
+                // ^ = exponente (potencia)
+                // ((1+C4)^6)-1 = eleva (1+tasa) a la 6ta potencia y resta 1
+                
+                ['2.57%', 'Bimensual', 0.0257, '=((1+C5)^3)-1', '=((1+C5)^1.5-1)/((1+C5)^1.5)*4', '=(D5/(1+D5))*2'],
+                ['3.69%', 'Trimestral', 0.0369, '=((1+C6)^2)-1', '=(C6/(1+C6))*4', '=(D6/(1+D6))*2'],
+                ['6.44%', 'Semestral', 0.0644, '=C7', '=((1+C7)^0.5-1)/((1+C7)^0.5)*4', '=(C7/(1+C7))*2']
+            ]);
+            XLSX.utils.book_append_sheet(wb, ws4, 'Problema 4');
+            
+            // ========================================
+            // PROBLEMA 5: Tiempo de inversión
+            // ========================================
+            const ws5 = XLSX.utils.aoa_to_sheet([
+                ['PROBLEMA 5: TIEMPO DE INVERSIÓN'],
+                [],
+                ['Datos:'],
+                ['Inversión inicial', '$14,000,000', 14000000],
+                ['Valor final deseado', '$30,000,000', 30000000],
+                ['Tasa efectiva mensual', '1.25%', 0.0125],
+                [],
+                ['Fórmula:', '=NPER(C6;0;-C4;C5;0)'],
+                ['Tiempo (meses):', '', '=NPER(C6,0,-C4,C5,0)'],
+                // NPER = Number of PERiods (Número de períodos)
+                // Calcula cuántos períodos se necesitan
+                // Parámetros: (tasa, pago, valor_actual, valor_futuro, tipo)
+                
+                ['Tiempo (años):', '', '=C9/12']
+                // Divide los meses entre 12 para obtener años
+            ]);
+            XLSX.utils.book_append_sheet(wb, ws5, 'Problema 5');
+            
+            // ========================================
+            // PROBLEMA 6: Valor futuro en diferentes escenarios
+            // ========================================
+            const ws6 = XLSX.utils.aoa_to_sheet([
+                ['PROBLEMA 6: VALOR FUTURO DE UNA INVERSIÓN'],
+                [],
+                ['Inversión inicial', '$20,000,000', 20000000],
+                [],
+                ['Escenario A: 6 meses al 1.75% mensual'],
+                ['Tasa efectiva mensual', '1.75%', 0.0175],
+                ['Plazo (meses)', 6],
+                ['Valor Futuro', '=VF(C6;C7;0;-C3;0)', '=FV(C6,C7,0,-C3,0)'],
+                // FV = Future Value (Valor Futuro)
+                // Calcula cuánto valdrá una inversión en el futuro
+                // Parámetros: (tasa, períodos, pago, valor_actual, tipo)
+                
+                [],
+                ['Escenario B: 2.5 años al 3.5% bimestral'],
+                ['Tasa efectiva bimestral', '3.5%', 0.035],
+                ['Plazo (años)', 2.5],
+                ['Plazo (bimestres)', 15],  // 2.5 años * 6 bimestres = 15
+                ['Valor Futuro', '=VF(C11;C13;0;-C3;0)', '=FV(C11,C13,0,-C3,0)'],
+                [],
+                ['Escenario C: 3 años al 4.5% semestral'],
+                ['Tasa efectiva semestral', '4.5%', 0.045],
+                ['Plazo (años)', 3],
+                ['Plazo (semestres)', 6],  // 3 años * 2 semestres = 6
+                ['Valor Futuro', '=VF(C17;C19;0;-C3;0)', '=FV(C17,C19,0,-C3,0)']
+            ]);
+            XLSX.utils.book_append_sheet(wb, ws6, 'Problema 6');
+            
+            // ========================================
+            // PROBLEMA 7: Número de pagos
+            // ========================================
+            const ws7 = XLSX.utils.aoa_to_sheet([
+                ['PROBLEMA 7: NÚMERO DE PAGOS PARA ACUMULAR CAPITAL'],
+                [],
+                ['Datos:'],
+                ['Valor a acumular', '$39,287,280', 39287280],
+                ['Depósito mensual', '$500,000', 500000],
+                ['Tasa efectiva mensual', '1.8%', 0.018],
+                [],
+                ['Fórmula:', '=NPER(C6;-C5;0;C4;0)'],
+                ['Número de pagos (meses):', '', '=NPER(C6,-C5,0,C4,0)'],
+                // -C5 es negativo porque es dinero que SALE (depósitos)
+                // C4 es positivo porque es dinero que ENTRA (acumulado final)
+                
+                ['Número de pagos (años):', '', '=C9/12']
+            ]);
+            XLSX.utils.book_append_sheet(wb, ws7, 'Problema 7');
+            
+            // ========================================
+            // PROBLEMA 8: Conversión de tasa efectiva
+            // ========================================
+            const ws8 = XLSX.utils.aoa_to_sheet([
+                ['PROBLEMA 8: CONVERSIÓN DE TASA EFECTIVA MENSUAL'],
+                [],
+                ['Tasa efectiva mensual', '1.72%', 0.0172],
+                [],
+                ['Conversiones:'],
+                ['T.N. Trimestral Vencida', '=(((1+C3)^3)-1)*4', '=(((1+C3)^3)-1)*4'],
+                // Convierte tasa mensual a trimestral y multiplica por 4 para anualizar
+                
+                ['T.N. Semestral Vencida', '=(((1+C3)^6)-1)*2', '=(((1+C3)^6)-1)*2'],
+                // Convierte tasa mensual a semestral y multiplica por 2 para anualizar
+                
+                ['T.N. Trimestral Anticipada', '=((((1+C3)^3)-1)/((1+C3)^3))*4', '=((((1+C3)^3)-1)/((1+C3)^3))*4'],
+                // Tasa anticipada = divide la tasa efectiva entre (1+tasa)
+                
+                ['T.N. Semestral Anticipada', '=((((1+C3)^6)-1)/((1+C3)^6))*2', '=((((1+C3)^6)-1)/((1+C3)^6))*2']
+            ]);
+            XLSX.utils.book_append_sheet(wb, ws8, 'Problema 8');
+            
+            // ========================================
+            // PROBLEMA 9: Ahorro mensual para casa
+            // ========================================
+            const ws9 = XLSX.utils.aoa_to_sheet([
+                ['PROBLEMA 9: AHORRO MENSUAL PARA COMPRA DE CASA'],
+                [],
+                ['Datos:'],
+                ['Valor de la casa', '$150,000,000', 150000000],
+                ['Plazo (años)', 5],
+                ['Plazo (meses)', 60],
+                ['Tasa efectiva mensual', '1.75%', 0.0175],
+                [],
+                ['Fórmula:', '=PAGO(C7;C6;0;-C4;0)'],
+                ['Ahorro mensual requerido:', '', '=PMT(C7,C6,0,-C4,0)']
+                // PMT = PayMenT (Pago)
+                // Calcula el pago periódico necesario
+                // Parámetros: (tasa, períodos, valor_actual, valor_futuro, tipo)
+            ]);
+            XLSX.utils.book_append_sheet(wb, ws9, 'Problema 9');
+            
+            // ========================================
+            // PROBLEMA 10: Ahorro para educación
+            // ========================================
+            const ws10 = XLSX.utils.aoa_to_sheet([
+                ['PROBLEMA 10: AHORRO PARA EDUCACIÓN UNIVERSITARIA'],
+                [],
+                ['Datos:'],
+                ['Ahorro mensual', '$800,000', 800000],
+                ['Tasa nominal anual', '15%', 0.15],
+                ['Tasa efectiva mensual', '=C5/12', '=C5/12'],
+                // Divide la tasa anual entre 12 para obtener la tasa mensual
+                
+                ['Edad inicial', 10],
+                ['Edad final', 18],
+                ['Plazo (años)', 8],  // 18 - 10 = 8 años
+                ['Plazo (meses)', 96],  // 8 * 12 = 96 meses
+                [],
+                ['Fórmula:', '=VF(C6;C10;-C4;0;0)'],
+                ['Capital acumulado:', '', '=FV(C6,C10,-C4,0,0)']
+                // Calcula cuánto dinero habrá acumulado después de 96 meses
+            ]);
+            XLSX.utils.book_append_sheet(wb, ws10, 'Problema 10');
+            
+            // ========================================
+            // HOJA RESUMEN: Resumen de todos los resultados
+            // ========================================
+            const wsResumen = XLSX.utils.aoa_to_sheet([
+                ['RESUMEN DE RESULTADOS - TALLER DE MATEMÁTICAS FINANCIERAS'],
+                [],
+                ['Problema', 'Descripción', 'Resultado Principal'],
+                ['1', 'Valor del préstamo inicial', '$12,088,843.28'],
+                ['2', 'Conversión de tasas nominales anticipadas', 'Ver hoja detallada'],
+                ['3', 'Valor de contado de propiedad', '$45,520,661.35'],
+                ['4', 'Conversión de tasas efectivas', 'Ver hoja detallada'],
+                ['5', 'Tiempo para duplicar inversión', '64.58 meses (5.38 años)'],
+                ['6a', 'VF a 6 meses (1.75% mensual)', '$22,180,931.52'],
+                ['6b', 'VF a 2.5 años (3.5% bimestral)', '$33,524,968.36'],
+                ['6c', 'VF a 3 años (4.5% semestral)', '$25,958,469.06'],
+                ['7', 'Número de pagos para acumular', '60 meses (5 años)'],
+                ['8', 'Conversión de 1.72% efectivo mensual', 'Ver hoja detallada'],
+                ['9', 'Ahorro mensual para casa', '$1,734,549.41'],
+                ['10', 'Capital para educación universitaria', '$154,916,558.67'],
+                [],
+                ['NOTAS IMPORTANTES:'],
+                ['- Todas las fórmulas están configuradas para actualizar automáticamente'],
+                ['- Los valores negativos en las fórmulas financieras representan salidas de dinero'],
+                ['- Los valores positivos representan entradas de dinero'],
+                ['- Las tasas deben ingresarse en formato decimal (ej: 1.5% = 0.015)'],
+                [],
+                ['FUNCIONES DE EXCEL UTILIZADAS:'],
+                ['VA (PV)', 'Valor Actual - Calcula el valor presente'],
+                ['VF (FV)', 'Valor Futuro - Calcula el valor futuro'],
+                ['PAGO (PMT)', 'Calcula el pago periódico'],
+                ['NPER', 'Calcula el número de períodos'],
+                [],
+                ['Desarrollado por: [Tu Nombre]'],
+                ['Fecha: ' + new Date().toLocaleDateString('es-CO')]
+                // Obtiene la fecha actual y la formatea en español de Colombia
+            ]);
+            XLSX.utils.book_append_sheet(wb, wsResumen, 'Resumen');
+            // Añade la hoja resumen como última hoja del libro
+            
+            // --- PASO FINAL: Generar y descargar el archivo ---
+            XLSX.writeFile(wb, 'Taller_Matematicas_Financieras.xlsx');
+            // writeFile() crea el archivo Excel y lo descarga automáticamente
+            // Parámetros: (libro, nombre_del_archivo)
+            // El archivo se descargará con el nombre 'Taller_Matematicas_Financieras.xlsx'
+        }
+    </script>
+    <!-- Fin del script JavaScript -->
+
+</body>
+</html>
